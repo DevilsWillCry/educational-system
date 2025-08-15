@@ -440,6 +440,18 @@
       .controls {
         gap: 8px;
       }
+
+
+      .column-buttons{
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        background: #f0f7ff;
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+      }
+    
       
       .btn-agregar, .btn-eliminar {
         min-width: 100%;

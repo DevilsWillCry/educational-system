@@ -372,6 +372,7 @@ const configuraciones = {
         title.innerHTML = `<i class="fas fa-layer-group"></i> ${bloque.nombre}`;
         
         const buttonsRow = document.createElement('div');
+        buttonsRow.className = 'column-buttons';
         buttonsRow.style.display = 'flex';
         buttonsRow.style.gap = '10px';
         buttonsRow.style.width = '100%';
