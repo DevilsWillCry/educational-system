@@ -1,791 +1,1130 @@
 <!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Tabla Calificaciones</title>
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/handsontable@12.4.0/dist/handsontable.full.min.css"
-    />
-    <style>
-      * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-      }
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Tabla Calificaciones</title>
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/handsontable@12.4.0/dist/handsontable.full.min.css"
+  />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1a2980, #26d0ce);
+      color: #333;
+      min-height: 100vh;
+      padding: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
+      overflow: hidden;
+    }
+
+    header {
+      background: #2c3e50;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    header::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        45deg,
+        rgba(255, 255, 255, 0.1) 0%,
+        transparent 100%
+      );
+      pointer-events: none;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      margin-bottom: 8px;
+      font-weight: 600;
+      position: relative;
+      z-index: 2;
+    }
+
+    .subtitle {
+      font-size: 0.9rem;
+      opacity: 0.9;
+      max-width: 700px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 2;
+      line-height: 1.4;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      padding: 15px;
+      background: #f8f9fa;
+      border-bottom: 1px solid #eaeaea;
+    }
+
+    .control-group {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .control-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+      color: #2c3e50;
+      font-size: 0.9rem;
+    }
+
+    select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 2px solid #3498db;
+      border-radius: 8px;
+      background: white;
+      font-size: 0.9rem;
+      color: #333;
+      transition: all 0.3s;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+
+    select:focus {
+      outline: none;
+      border-color: #2980b9;
+      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
+    }
+
+    .learning-goal {
+      padding: 15px;
+      background: #e3f2fd;
+      border-bottom: 1px solid #bbdefb;
+    }
+
+    .learning-goal h3 {
+      color: #0d47a1;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1rem;
+    }
+
+    .learning-goal h3::before {
+      content: "🎯";
+      font-size: 1.2rem;
+    }
+
+    #metaInput {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #64b5f6;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      transition: all 0.3s;
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    #metaInput:focus {
+      outline: none;
+      border-color: #2196f3;
+      box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2);
+    }
+
+    #tabla {
+      width: 100%;
+      margin-top: 15px;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      overflow-x: auto;
+      min-height: 300px;
+    }
+
+    .add-column-section {
+      padding: 15px;
+      background: #e8f4ff;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      border-bottom: 1px solid #bbdefb;
+    }
+
+    .add-column-section h3 {
+      color: #0d47a1;
+      font-size: 1rem;
+      margin: 0;
+    }
+
+    .buttons-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      width: 100%;
+      height: auto;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-agregar {
+      background: #4caf50;
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s;
+      font-size: 0.9rem;
+      flex: 1;
+      min-width: 180px;
+      justify-content: center;
+    }
+
+    .btn-eliminar {
+      background: #f44336;
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s;
+      font-size: 0.9rem;
+      flex: 1;
+      min-width: 180px;
+      justify-content: center;
+    }
+
+    .btn-agregar:hover, .btn-eliminar:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn-agregar:hover {
+      background: #388e3c;
+    }
+
+    .btn-eliminar:hover {
+      background: #d32f2f;
+    }
+
+    .btn-agregar::before {
+      content: "+";
+      font-size: 1.1rem;
+      line-height: 1;
+    }
+
+    .btn-eliminar::before {
+      content: "−";
+      font-size: 1.3rem;
+      line-height: 1;
+    }
+
+    .info-section {
+      background: #e8f4ff;
+      padding: 15px;
+      margin: 0 15px 15px;
+      border-radius: 10px;
+      border-left: 5px solid #0288d1;
+    }
+
+    .info-section h3 {
+      color: #01579b;
+      margin-bottom: 12px;
+      font-size: 1.1rem;
+    }
+
+    .features {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .feature {
+      background: white;
+      border-radius: 8px;
+      padding: 12px;
+      flex: 1;
+      min-width: 200px;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    .feature h4 {
+      color: #2c3e50;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.95rem;
+    }
+
+    .feature h4::before {
+      content: "✓";
+      background: #4caf50;
+      color: white;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: bold;
+      font-size: 0.9rem;
+    }
+
+    .feature p {
+      font-size: 0.85rem;
+      line-height: 1.4;
+    }
+
+    .highlight {
+      background: #fff9c4;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    footer {
+      text-align: center;
+      padding: 15px;
+      color: #7f8c8d;
+      border-top: 1px solid #eee;
+      background: #f8f9fa;
+      font-size: 0.8rem;
+    }
+    
+    .column-management {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background: #f0f7ff;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+    
+    .column-title {
+      font-weight: 600;
+      color: #0d47a1;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .column-title i {
+      font-size: 1.2rem;
+    }
+
+    /* Media Queries para Responsive */
+    @media (max-width: 768px) {
       body {
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-        background: linear-gradient(135deg, #1a2980, #26d0ce);
-        color: #333;
-        min-height: 100vh;
-        padding: 20px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
+        padding: 5px;
+        align-items: flex-start;
       }
-
+      
       .container {
-        width: 100%;
-        max-width: 1200px;
-        background: white;
-        border-radius: 15px;
-        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.25);
-        overflow: hidden;
+        border-radius: 12px;
       }
-
+      
       header {
-        background: #2c3e50;
-        color: white;
-        padding: 25px;
-        text-align: center;
-        position: relative;
-        overflow: hidden;
+        padding: 15px 10px;
       }
-
-      header::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(
-          45deg,
-          rgba(255, 255, 255, 0.1) 0%,
-          transparent 100%
-        );
-        pointer-events: none;
-      }
-
+      
       h1 {
-        font-size: 2.5rem;
-        margin-bottom: 10px;
-        font-weight: 600;
-        position: relative;
-        z-index: 2;
-      }
-
-      .subtitle {
-        font-size: 1.1rem;
-        opacity: 0.9;
-        max-width: 700px;
-        margin: 0 auto;
-        position: relative;
-        z-index: 2;
-      }
-
-      .controls {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 20px;
-        padding: 25px;
-        background: #f8f9fa;
-        border-bottom: 1px solid #eaeaea;
-      }
-
-      .control-group {
-        flex: 1;
-        min-width: 200px;
-      }
-
-      .control-group label {
-        display: block;
-        margin-bottom: 8px;
-        font-weight: 600;
-        color: #2c3e50;
-      }
-
-      select {
-        width: 100%;
-        padding: 12px 15px;
-        border: 2px solid #3498db;
-        border-radius: 8px;
-        background: white;
-        font-size: 16px;
-        color: #333;
-        transition: all 0.3s;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-      }
-
-      select:focus {
-        outline: none;
-        border-color: #2980b9;
-        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
-      }
-
-      .learning-goal {
-        padding: 20px 25px;
-        background: #e3f2fd;
-        border-bottom: 1px solid #bbdefb;
-      }
-
-      .learning-goal h3 {
-        color: #0d47a1;
-        margin-bottom: 15px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-
-      .learning-goal h3::before {
-        content: "🎯";
         font-size: 1.5rem;
       }
-
-      #metaInput {
-        width: 100%;
-        padding: 15px;
-        border: 2px solid #64b5f6;
-        border-radius: 8px;
-        font-size: 16px;
-        transition: all 0.3s;
-        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+      
+      .subtitle {
+        font-size: 0.85rem;
       }
-
-      #metaInput:focus {
-        outline: none;
-        border-color: #2196f3;
-        box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2);
-      }
-
-      #tabla {
-        width: 100%;
-        margin-top: 20px;
-        border-radius: 8px;
-        overflow: hidden;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-      }
-
-      .add-column-section {
-        display: flex;
-        padding: 15px 25px;
-        background: #e8f4ff;
-        display: flex;
-        gap: 15px;
-        flex-wrap: wrap;
-        align-items: center;
-        border-bottom: 1px solid #bbdefb;
-      }
-
-      .add-column-section h3 {
-        color: #0d47a1;
-        font-size: 1.1rem;
-        margin: 0;
-      }
-
-      #addColumnButtons{
-        display: flex;
+      
+      .controls {
+        flex-direction: column;
         gap: 10px;
+        padding: 12px;
+      }
+      
+      .control-group {
         width: 100%;
-        height: auto;
-        align-items: center;
-        justify-content: center;
+        min-width: auto;
       }
-
-      .btn-agregar {
-        background: #4caf50;
-        color: white;
-        border: none;
-        padding: 8px 15px;
-        border-radius: 5px;
-        cursor: pointer;
-        font-weight: bold;
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        transition: all 0.3s;
-      }
-
-      .btn-agregar:hover {
-        background: #388e3c;
-        transform: translateY(-2px);
-        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
-      }
-
-      .btn-agregar::before {
-        content: "+";
-        font-size: 1.2rem;
-        line-height: 1;
-      }
-
-      .info-section {
-        background: #e8f4ff;
-        padding: 20px;
-        margin: 0 25px 25px;
-        border-radius: 10px;
-        border-left: 5px solid #0288d1;
-      }
-
-      .info-section h3 {
-        color: #01579b;
-        margin-bottom: 15px;
-        font-size: 1.4rem;
-      }
-
-      .features {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 15px;
-        margin-top: 15px;
-      }
-
-      .feature {
-        background: white;
-        border-radius: 8px;
-        padding: 15px;
-        flex: 1;
-        min-width: 200px;
-        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
-      }
-
-      .feature h4 {
-        color: #2c3e50;
-        margin-bottom: 10px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-
-      .feature h4::before {
-        content: "✓";
-        background: #4caf50;
-        color: white;
-        width: 24px;
-        height: 24px;
-        border-radius: 50%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-weight: bold;
-      }
-
-      .highlight {
-        background: #fff9c4;
-        padding: 2px 6px;
-        border-radius: 4px;
-        font-weight: 600;
-      }
-
-      footer {
-        text-align: center;
-        padding: 20px;
-        color: #7f8c8d;
-        border-top: 1px solid #eee;
-        background: #f8f9fa;
+      
+      select {
+        padding: 9px 10px;
         font-size: 0.9rem;
       }
-
-      @media (max-width: 768px) {
-        .controls {
-          flex-direction: flex;
-        }
-
-        .add-column-section {
-          flex-direction: column;
-          align-items: flex-start;
-        }
-
-        header {
-          padding: 20px 15px;
-        }
-
-        h1 {
-          font-size: 1.8rem;
-        }
-
-        .info-section {
-          margin: 0 15px 15px;
-        }
-
-        #tabla {
-          padding: 0 15px 15px;
-        }
+      
+      .learning-goal {
+        padding: 12px;
       }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <header>
-        <h1>Tabla de Calificaciones</h1>
-        <p class="subtitle">
-          Sistema completo para gestión de calificaciones con columnas
-          personalizables
-        </p>
-      </header>
+      
+      .learning-goal h3 {
+        font-size: 0.95rem;
+      }
+      
+      #metaInput {
+        padding: 10px;
+        font-size: 0.9rem;
+      }
+      
+      .add-column-section {
+        padding: 12px;
+      }
+      
+      .add-column-section h3 {
+        font-size: 0.95rem;
+      }
+      
+      .btn-agregar, .btn-eliminar {
+        font-size: 0.85rem;
+        min-width: 160px;
+        padding: 7px 12px;
+      }
+      
+      .info-section {
+        padding: 12px;
+        margin: 0 10px 10px;
+      }
+      
+      .info-section h3 {
+        font-size: 1rem;
+      }
+      
+      .feature {
+        padding: 10px;
+      }
+      
+      footer {
+        padding: 12px;
+        font-size: 0.75rem;
+      }
+    }
 
-      <div class="controls">
-        <div class="control-group">
-          <label for="institucion">Institución:</label>
-          <select id="institucion"></select>
-        </div>
+    @media (max-width: 480px) {
+      body {
+        padding: 0;
+      }
+      
+      .container {
+        border-radius: 0;
+        box-shadow: none;
+      }
+      
+      header {
+        border-radius: 0;
+      }
+      
+      h1 {
+        font-size: 1.3rem;
+      }
+      
+      .controls {
+        gap: 8px;
+      }
+      
+      .btn-agregar, .btn-eliminar {
+        min-width: 100%;
+      }
+      
+      .features {
+        gap: 8px;
+      }
+      
+      .feature {
+        min-width: 100%;
+      }
+    }
+    
+    /* Corrección para la tabla */
+    .htCore {
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+    
+    .htCore td {
+      padding: 10px;
+      border: 1px solid #e0e0e0;
+    }
+    
+    .htCore th {
+      background: #f0f7ff;
+      font-weight: 600;
+      color: #1a237e;
+      text-align: center;
+      border: 1px solid #c5d9f1;
+    }
+    
+    .htCore tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+    
+    .htCore tr:hover {
+      background-color: #f0f7ff;
+    }
+    
+    .bloque-header {
+      background-color: #e3f2fd;
+    }
+    
+    .history-panel {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 15px;
+      margin: 15px;
+      border-left: 4px solid #4caf50;
+    }
+    
+    .history-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #2c3e50;
+      margin-bottom: 10px;
+    }
+    
+    .history-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    
+    .history-item {
+      background: white;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Tabla de Calificaciones</h1>
+      <p class="subtitle">
+        Sistema completo para gestión de calificaciones con columnas personalizables
+      </p>
+    </header>
 
-        <div class="control-group">
-          <label for="grupo">Grupo:</label>
-          <select id="grupo"></select>
-        </div>
-
-        <div class="control-group">
-          <label for="periodo">Período:</label>
-          <select id="periodo"></select>
-        </div>
+    <div class="controls">
+      <div class="control-group">
+        <label for="institucion">Institución:</label>
+        <select id="institucion"></select>
       </div>
 
-      <div class="learning-goal">
-        <h3>Meta de Aprendizaje para el Grupo:</h3>
-        <input
-          type="text"
-          id="metaInput"
-          placeholder="Escribe aquí la meta de aprendizaje para todo el grupo..."
-        />
+      <div class="control-group">
+        <label for="grupo">Grupo:</label>
+        <select id="grupo"></select>
       </div>
 
-      <div class="add-column-section">
-        <h3>Añadir nuevas columnas de evaluación:</h3>
-        <div id="addColumnButtons"></div>
+      <div class="control-group">
+        <label for="periodo">Período:</label>
+        <select id="periodo"></select>
       </div>
-
-      <div id="tabla"></div>
-
-      <div class="info-section">
-        <h3>Característica:</h3>
-        <p>
-          Ahora puedes añadir nuevas columnas de evaluación a cada bloque según
-          tus necesidades.
-        </p>
-
-        <div class="features">
-          <div class="feature">
-            <h4>Flexibilidad</h4>
-            <p>
-              Añade tantas columnas P como necesites para evaluar cada aspecto
-              del aprendizaje.
-            </p>
-          </div>
-          <div class="feature">
-            <h4>Personalizado</h4>
-            <p>
-              Cada bloque puede tener un número diferente de columnas según tus
-              necesidades.
-            </p>
-          </div>
-          <div class="feature">
-            <h4>Automático</h4>
-            <p>
-              Los cálculos de notas se actualizan automáticamente al añadir
-              nuevas columnas.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <footer>
-        Sistema de Calificaciones &copy; 2023 | Con la nueva función de Columnas
-        Dinámicas
-      </footer>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/handsontable@12.4.0/dist/handsontable.full.min.js"></script>
-    <script>
-      const configuraciones = {
-        "Institución 1": {
-          periodos: ["Periodo 1", "Periodo 2", "Periodo 3"],
-          bloques: [
-            {
-              nombre: "Cognitivo",
-              subCols: ["P1", "P2", "P3"],
-              calculo: "promedio",
-            },
-            {
-              nombre: "Procedimental",
-              subCols: ["P1", "P2", "P3"],
-              calculo: "promedio",
-            },
-            {
-              nombre: "Coevaluación",
-              subCols: ["P1", "P2"],
-              calculo: "promedio",
-            },
-          ],
-        },
-        "Institución 2": {
-          periodos: ["Periodo Único"],
-          bloques: [
-            {
-              nombre: "Periodo",
-              subCols: ["P1", "P2", "P3", "P4"],
-              calculo: "promedio",
-            },
-          ],
-        },
-        "Institución 3": {
-          periodos: ["Periodo 1", "Periodo 2"],
-          bloques: [
-            {
-              nombre: "Única",
-              subCols: ["P1", "P2", "P3", "P4"],
-              calculo: "promedio",
-            },
-          ],
-        },
-      };
+    <div class="learning-goal">
+      <h3>Meta de Aprendizaje para el Grupo:</h3>
+      <input
+        type="text"
+        id="metaInput"
+        placeholder="Escribe aquí la meta de aprendizaje para todo el grupo..."
+      />
+    </div>
 
-      const estudiantes = {
-        "Institución 1": {
-          "8-1": [
-            "Juan Pérez",
-            "María Gómez",
-            "Andrés Torres",
-            "Laura Martínez",
-          ],
-          "8-2": ["Pedro Rojas", "Ana Fernández"],
-        },
-        "Institución 2": {
-          "7-1": ["Luis Castillo", "Carmen Díaz"],
-          "7-2": ["Miguel López", "Daniela Ruiz"],
-        },
-        "Institución 3": {
-          "9-1": ["Sofía Herrera", "Mateo García"],
-        },
-      };
+    <div class="add-column-section">
+      <h3>Gestión de Columnas:</h3>
+      <div id="addColumnButtons" class="buttons-container"></div>
+    </div>
+    
+    <div class="history-panel">
+      <div class="history-title">
+        <i class="fas fa-history"></i>
+        <h3>Historial de Cambios</h3>
+      </div>
+      <div id="changeHistory" class="history-list"></div>
+    </div>
 
-      let datosGuardados = {};
-      let metasGuardadas = {};
-      let configuracionesGuardadas = {};
-      let hot = null;
+    <div id="tabla"></div>
 
-      const contenedor = document.getElementById("tabla");
-      const instSelect = document.getElementById("institucion");
-      const grupoSelect = document.getElementById("grupo");
-      const periodoSelect = document.getElementById("periodo");
-      const metaInput = document.getElementById("metaInput");
-      const addColumnButtons = document.getElementById("addColumnButtons");
+    <div class="info-section">
+      <h3>Característica:</h3>
+      <p>
+        Ahora puedes añadir y eliminar columnas de evaluación en cada bloque según tus necesidades.
+      </p>
 
-      // Función para clonar objetos
-      function clonarConfiguracion(config) {
-        return JSON.parse(JSON.stringify(config));
-      }
+      <div class="features">
+        <div class="feature">
+          <h4>Flexibilidad</h4>
+          <p>
+            Añade o elimina columnas P según sea necesario para evaluar cada aspecto del aprendizaje.
+          </p>
+        </div>
+        <div class="feature">
+          <h4>Personalizado</h4>
+          <p>
+            Cada bloque puede tener un número diferente de columnas según tus necesidades específicas.
+          </p>
+        </div>
+        <div class="feature">
+          <h4>Automático</h4>
+          <p>
+            Los cálculos de notas se actualizan automáticamente al añadir o eliminar columnas.
+          </p>
+        </div>
+      </div>
+    </div>
 
-      // Obtener configuración para una combinación inst/grupo/periodo
-      function obtenerConfiguracion(inst, grupo, periodo) {
-        configuracionesGuardadas[inst] = configuracionesGuardadas[inst] || {};
-        configuracionesGuardadas[inst][grupo] =
-          configuracionesGuardadas[inst][grupo] || {};
+    <footer>
+      Sistema de Calificaciones &copy; 2023 | Con la nueva función de Columnas Dinámicas
+    </footer>
+  </div>
 
-        if (!configuracionesGuardadas[inst][grupo][periodo]) {
-          // Clonar la configuración base
-          configuracionesGuardadas[inst][grupo][periodo] = clonarConfiguracion(
-            configuraciones[inst]
-          );
-        }
-
-        return configuracionesGuardadas[inst][grupo][periodo];
-      }
-
-      // Inicializar select de instituciones
-      Object.keys(configuraciones).forEach((inst) => {
-        const opt = document.createElement("option");
-        opt.value = inst;
-        opt.textContent = inst;
-        instSelect.appendChild(opt);
-      });
-
-      function actualizarGrupos() {
-        grupoSelect.innerHTML = "";
-        const inst = instSelect.value;
-        Object.keys(estudiantes[inst]).forEach((gr) => {
-          const opt = document.createElement("option");
-          opt.value = gr;
-          opt.textContent = gr;
-          grupoSelect.appendChild(opt);
-        });
-      }
-
-      function actualizarPeriodos() {
-        periodoSelect.innerHTML = "";
-        const inst = instSelect.value;
-        configuraciones[inst].periodos.forEach((p) => {
-          const opt = document.createElement("option");
-          opt.value = p;
-          opt.textContent = p;
-          periodoSelect.appendChild(opt);
-        });
-      }
-
-      function crearPlantillaFila(config, nombreEstudiante) {
-        const fila = [nombreEstudiante];
-        config.bloques.forEach((b) => {
-          b.subCols.forEach(() => fila.push(false));
-          fila.push(0);
-        });
-        return fila;
-      }
-
-      function generarColumnasYHeaders(config) {
-        const columns = [
+  <script src="https://cdn.jsdelivr.net/npm/handsontable@12.4.0/dist/handsontable.full.min.js"></script>
+  <script>
+    const configuraciones = {
+      "Institución 1": {
+        periodos: ["Periodo 1", "Periodo 2", "Periodo 3"],
+        bloques: [
           {
-            type: "text",
-            readOnly: true,
-            className: "htMiddle",
-            renderer: function (instance, td, row, col, prop, value) {
-              // Renderizado personalizado para la columna de estudiantes
-              Handsontable.renderers.TextRenderer.apply(this, arguments);
-              td.style.fontWeight = "600";
-              td.style.color = "#1a237e";
-              td.style.background = "#f5f7ff";
-            },
+            nombre: "Cognitivo",
+            subCols: ["P1", "P2", "P3"],
+            calculo: "promedio",
           },
-        ];
+          {
+            nombre: "Procedimental",
+            subCols: ["P1", "P2", "P3"],
+            calculo: "promedio",
+          },
+          {
+            nombre: "Coevaluación",
+            subCols: ["P1", "P2"],
+            calculo: "promedio",
+          },
+        ],
+      },
+      "Institución 2": {
+        periodos: ["Periodo Único"],
+        bloques: [
+          {
+            nombre: "Periodo",
+            subCols: ["P1", "P2", "P3", "P4"],
+            calculo: "promedio",
+          },
+        ],
+      },
+      "Institución 3": {
+        periodos: ["Periodo 1", "Periodo 2"],
+        bloques: [
+          {
+            nombre: "Única",
+            subCols: ["P1", "P2", "P3", "P4"],
+            calculo: "promedio",
+          },
+        ],
+      },
+    };
 
-        const headerFila1 = [{ label: "", rowspan: 1 }];
+    const estudiantes = {
+      "Institución 1": {
+        "8-1": [
+          "Juan Pérez",
+          "María Gómez",
+          "Andrés Torres",
+          "Laura Martínez",
+        ],
+        "8-2": ["Pedro Rojas", "Ana Fernández"],
+      },
+      "Institución 2": {
+        "7-1": ["Luis Castillo", "Carmen Díaz"],
+        "7-2": ["Miguel López", "Daniela Ruiz"],
+      },
+      "Institución 3": {
+        "9-1": ["Sofía Herrera", "Mateo García"],
+      },
+    };
 
-        const headerFila2 = ["Estudiantes"];
+    let datosGuardados = {};
+    let metasGuardadas = {};
+    let configuracionesGuardadas = {};
+    let hot = null;
+    let changeHistory = [];
 
+    const contenedor = document.getElementById("tabla");
+    const instSelect = document.getElementById("institucion");
+    const grupoSelect = document.getElementById("grupo");
+    const periodoSelect = document.getElementById("periodo");
+    const metaInput = document.getElementById("metaInput");
+    const addColumnButtons = document.getElementById("addColumnButtons");
+    const changeHistoryContainer = document.getElementById("changeHistory");
+
+    // Función para clonar objetos
+    function clonarConfiguracion(config) {
+      return JSON.parse(JSON.stringify(config));
+    }
+
+    // Obtener configuración para una combinación inst/grupo/periodo
+    function obtenerConfiguracion(inst, grupo, periodo) {
+      configuracionesGuardadas[inst] = configuracionesGuardadas[inst] || {};
+      configuracionesGuardadas[inst][grupo] =
+        configuracionesGuardadas[inst][grupo] || {};
+
+      if (!configuracionesGuardadas[inst][grupo][periodo]) {
+        // Clonar la configuración base
+        configuracionesGuardadas[inst][grupo][periodo] = clonarConfiguracion(
+          configuraciones[inst]
+        );
+      }
+
+      return configuracionesGuardadas[inst][grupo][periodo];
+    }
+
+    // Inicializar select de instituciones
+    Object.keys(configuraciones).forEach((inst) => {
+      const opt = document.createElement("option");
+      opt.value = inst;
+      opt.textContent = inst;
+      instSelect.appendChild(opt);
+    });
+
+    function actualizarGrupos() {
+      grupoSelect.innerHTML = "";
+      const inst = instSelect.value;
+      Object.keys(estudiantes[inst]).forEach((gr) => {
+        const opt = document.createElement("option");
+        opt.value = gr;
+        opt.textContent = gr;
+        grupoSelect.appendChild(opt);
+      });
+    }
+
+    function actualizarPeriodos() {
+      periodoSelect.innerHTML = "";
+      const inst = instSelect.value;
+      configuraciones[inst].periodos.forEach((p) => {
+        const opt = document.createElement("option");
+        opt.value = p;
+        opt.textContent = p;
+        periodoSelect.appendChild(opt);
+      });
+    }
+
+    function crearPlantillaFila(config, nombreEstudiante) {
+      const fila = [nombreEstudiante];
+      config.bloques.forEach((b) => {
+        b.subCols.forEach(() => fila.push(false));
+        fila.push(0);
+      });
+      return fila;
+    }
+
+    function generarColumnasYHeaders(config) {
+      const columns = [
+        {
+          type: "text",
+          readOnly: true,
+          className: "htMiddle",
+          renderer: function (instance, td, row, col, prop, value) {
+            // Renderizado personalizado para la columna de estudiantes
+            Handsontable.renderers.TextRenderer.apply(this, arguments);
+            td.style.fontWeight = "600";
+            td.style.color = "#1a237e";
+            td.style.background = "#f5f7ff";
+          },
+        },
+      ];
+
+      const headerFila1 = [{ label: "", rowspan: 1 }];
+
+      const headerFila2 = ["Estudiantes"];
+
+      config.bloques.forEach((b) => {
+        headerFila1.push({
+          label: b.nombre,
+          colspan: b.subCols.length + 1,
+          className: "bloque-header"
+        });
+        b.subCols.forEach((sub) => headerFila2.push(sub));
+        headerFila2.push("Nota");
+
+        // Añadir columnas para checkboxes y nota
+        b.subCols.forEach(() =>
+          columns.push({ type: "checkbox", className: "htCenter" })
+        );
+        columns.push({
+          type: "numeric",
+          readOnly: true,
+          numericFormat: { pattern: "0.00" },
+          className: "htCenter",
+          renderer: function (instance, td, row, col, prop, value) {
+            // Renderizado personalizado para las notas
+            Handsontable.renderers.NumericRenderer.apply(this, arguments);
+
+            // Resaltar notas según su valor
+            if (value >= 4) td.style.background = "#e8f5e9";
+            else if (value >= 3) td.style.background = "#fff8e1";
+            else if (value > 0) td.style.background = "#ffebee";
+          },
+        });
+      });
+
+      return { columns, nestedHeaders: [headerFila1, headerFila2] };
+    }
+
+    function recalcularNotas(config) {
+      if (!hot) return;
+      const filas = hot.countRows();
+
+      // Ahora empezamos desde la columna 1
+      for (let r = 0; r < filas; r++) {
+        let col = 1;
         config.bloques.forEach((b) => {
-          headerFila1.push({
-            label: b.nombre,
-            colspan: b.subCols.length + 1,
-          });
-          b.subCols.forEach((sub) => headerFila2.push(sub));
-          headerFila2.push("Nota");
-
-          // Añadir columnas para checkboxes y nota
-          b.subCols.forEach(() =>
-            columns.push({ type: "checkbox", className: "htCenter" })
-          );
-          columns.push({
-            type: "numeric",
-            readOnly: true,
-            numericFormat: { pattern: "0.00" },
-            className: "htCenter",
-            renderer: function (instance, td, row, col, prop, value) {
-              // Renderizado personalizado para las notas
-              Handsontable.renderers.NumericRenderer.apply(this, arguments);
-
-              // Resaltar notas según su valor
-              if (value >= 4) td.style.background = "#e8f5e9";
-              else if (value >= 3) td.style.background = "#fff8e1";
-              else if (value > 0) td.style.background = "#ffebee";
-            },
-          });
-        });
-
-        return { columns, nestedHeaders: [headerFila1, headerFila2] };
-      }
-
-      function recalcularNotas(config) {
-        if (!hot) return;
-        const filas = hot.countRows();
-
-        // Ahora empezamos desde la columna 1
-        for (let r = 0; r < filas; r++) {
-          let col = 1;
-          config.bloques.forEach((b) => {
-            const checks = [];
-            for (let i = 0; i < b.subCols.length; i++) {
-              const val = hot.getDataAtCell(r, col + i);
-              checks.push(val === true || val === "true" || val === 1);
-            }
-            let nota = 0;
-            if (b.calculo === "suma") {
-              nota = checks.reduce((acc, v) => acc + (v ? 5 : 0), 0);
-            } else if (b.calculo === "maximo" || b.calculo === "máximo") {
-              const valores = checks.map((v) => (v ? 5 : 0));
-              nota = valores.length ? Math.max(...valores) : 0;
-            } else {
-              const total = checks.filter(Boolean).length;
-              nota = b.subCols.length ? (total / b.subCols.length) * 5 : 0;
-            }
-            hot.setDataAtCell(
-              r,
-              col + b.subCols.length,
-              parseFloat(nota.toFixed(2)),
-              "calc"
-            );
-            col += b.subCols.length + 1;
-          });
-        }
-      }
-
-      function guardarDatos(inst, grupo, periodo) {
-        datosGuardados[inst] = datosGuardados[inst] || {};
-        datosGuardados[inst][grupo] = datosGuardados[inst][grupo] || {};
-        datosGuardados[inst][grupo][periodo] = hot.getData();
-      }
-
-      function cargarDatos(inst, grupo, periodo, config) {
-        if (
-          datosGuardados[inst] &&
-          datosGuardados[inst][grupo] &&
-          datosGuardados[inst][grupo][periodo]
-        ) {
-          return datosGuardados[inst][grupo][periodo];
-        } else {
-          return estudiantes[inst][grupo].map((nombre) =>
-            crearPlantillaFila(config, nombre)
-          );
-        }
-      }
-
-      function guardarMeta(inst, grupo, periodo) {
-        metasGuardadas[inst] = metasGuardadas[inst] || {};
-        metasGuardadas[inst][grupo] = metasGuardadas[inst][grupo] || {};
-        metasGuardadas[inst][grupo][periodo] = metaInput.value;
-      }
-
-      function cargarMeta(inst, grupo, periodo) {
-        if (
-          metasGuardadas[inst] &&
-          metasGuardadas[inst][grupo] &&
-          metasGuardadas[inst][grupo][periodo]
-        ) {
-          return metasGuardadas[inst][grupo][periodo];
-        } else {
-          return "";
-        }
-      }
-
-      function agregarColumnaABloque(inst, grupo, periodo, bloqueIndex) {
-        const config = obtenerConfiguracion(inst, grupo, periodo);
-        const bloque = config.bloques[bloqueIndex];
-
-        // Determinar el próximo número
-        const nextNum = bloque.subCols.length + 1;
-        const nuevaCol = `P${nextNum}`;
-        bloque.subCols.push(nuevaCol);
-
-        // Actualizar los datos guardados para agregar la nueva columna en cada fila
-        if (
-          datosGuardados[inst] &&
-          datosGuardados[inst][grupo] &&
-          datosGuardados[inst][grupo][periodo]
-        ) {
-          const data = datosGuardados[inst][grupo][periodo];
-
-          // Calcular la posición donde insertar
-          let startCol = 1; // después del nombre
-          for (let i = 0; i < bloqueIndex; i++) {
-            startCol += config.bloques[i].subCols.length + 1;
+          const checks = [];
+          for (let i = 0; i < b.subCols.length; i++) {
+            const val = hot.getDataAtCell(r, col + i);
+            checks.push(val === true || val === "true" || val === 1);
           }
+          let nota = 0;
+          if (b.calculo === "suma") {
+            nota = checks.reduce((acc, v) => acc + (v ? 5 : 0), 0);
+          } else if (b.calculo === "maximo" || b.calculo === "máximo") {
+            const valores = checks.map((v) => (v ? 5 : 0));
+            nota = valores.length ? Math.max(...valores) : 0;
+          } else {
+            const total = checks.filter(Boolean).length;
+            nota = b.subCols.length ? (total / b.subCols.length) * 5 : 0;
+          }
+          hot.setDataAtCell(
+            r,
+            col + b.subCols.length,
+            parseFloat(nota.toFixed(2)),
+            "calc"
+          );
+          col += b.subCols.length + 1;
+        });
+      }
+    }
 
-          // Insertar en cada fila un false en la posición correcta
-          datosGuardados[inst][grupo][periodo] = data.map((fila) => {
-            const newFila = [...fila];
-            newFila.splice(startCol + bloque.subCols.length - 1, 0, false);
-            return newFila;
-          });
+    function guardarDatos(inst, grupo, periodo) {
+      datosGuardados[inst] = datosGuardados[inst] || {};
+      datosGuardados[inst][grupo] = datosGuardados[inst][grupo] || {};
+      datosGuardados[inst][grupo][periodo] = hot.getData();
+    }
+
+    function cargarDatos(inst, grupo, periodo, config) {
+      if (
+        datosGuardados[inst] &&
+        datosGuardados[inst][grupo] &&
+        datosGuardados[inst][grupo][periodo]
+      ) {
+        return datosGuardados[inst][grupo][periodo];
+      } else {
+        return estudiantes[inst][grupo].map((nombre) =>
+          crearPlantillaFila(config, nombre)
+        );
+      }
+    }
+
+    function guardarMeta(inst, grupo, periodo) {
+      metasGuardadas[inst] = metasGuardadas[inst] || {};
+      metasGuardadas[inst][grupo] = metasGuardadas[inst][grupo] || {};
+      metasGuardadas[inst][grupo][periodo] = metaInput.value;
+    }
+
+    function cargarMeta(inst, grupo, periodo) {
+      if (
+        metasGuardadas[inst] &&
+        metasGuardadas[inst][grupo] &&
+        metasGuardadas[inst][grupo][periodo]
+      ) {
+        return metasGuardadas[inst][grupo][periodo];
+      } else {
+        return "";
+      }
+    }
+    
+    // Función para registrar cambios en el historial
+    function registrarCambio(accion, bloque) {
+      const timestamp = new Date().toLocaleTimeString();
+      const historyItem = document.createElement('div');
+      historyItem.className = 'history-item';
+      historyItem.innerHTML = `
+        <i class="fas fa-${accion === 'add' ? 'plus-circle' : 'minus-circle'}"></i>
+        ${accion === 'add' ? 'Agregada' : 'Eliminada'} columna en ${bloque} (${timestamp})
+      `;
+      changeHistoryContainer.prepend(historyItem);
+      
+      // Mantener solo los últimos 5 elementos
+      if (changeHistoryContainer.children.length > 5) {
+        changeHistoryContainer.removeChild(changeHistoryContainer.lastChild);
+      }
+    }
+
+    function agregarColumnaABloque(inst, grupo, periodo, bloqueIndex) {
+      const config = obtenerConfiguracion(inst, grupo, periodo);
+      const bloque = config.bloques[bloqueIndex];
+
+      // Determinar el próximo número
+      const nextNum = bloque.subCols.length + 1;
+      const nuevaCol = `P${nextNum}`;
+      bloque.subCols.push(nuevaCol);
+
+      // Registrar cambio
+      registrarCambio('add', bloque.nombre);
+
+      // Actualizar los datos guardados para agregar la nueva columna en cada fila
+      if (
+        datosGuardados[inst] &&
+        datosGuardados[inst][grupo] &&
+        datosGuardados[inst][grupo][periodo]
+      ) {
+        const data = datosGuardados[inst][grupo][periodo];
+
+        // Calcular la posición donde insertar
+        let startCol = 1; // después del nombre
+        for (let i = 0; i < bloqueIndex; i++) {
+          startCol += config.bloques[i].subCols.length + 1;
         }
 
-        // Volver a renderizar la tabla
-        renderTabla();
-      }
-
-      function crearBotonesAgregarColumnas(inst, grupo, periodo) {
-        const config = obtenerConfiguracion(inst, grupo, periodo);
-        addColumnButtons.innerHTML = "";
-
-        config.bloques.forEach((bloque, index) => {
-          const btn = document.createElement("button");
-          btn.className = "btn-agregar";
-          btn.textContent = `Añadir columna a ${bloque.nombre}`;
-          btn.dataset.bloque = index;
-          addColumnButtons.appendChild(btn);
+        // Insertar en cada fila un false en la posición correcta
+        datosGuardados[inst][grupo][periodo] = data.map((fila) => {
+          const newFila = [...fila];
+          newFila.splice(startCol + bloque.subCols.length - 1, 0, false);
+          return newFila;
         });
       }
 
-      function renderTabla() {
+      // Volver a renderizar la tabla
+      renderTabla();
+    }
+    
+    function eliminarUltimaColumnaBloque(inst, grupo, periodo, bloqueIndex) {
+      const config = obtenerConfiguracion(inst, grupo, periodo);
+      const bloque = config.bloques[bloqueIndex];
+      
+      // Verificar si hay columnas para eliminar
+      if (bloque.subCols.length <= 1) {
+        alert(`No se puede eliminar más columnas del bloque ${bloque.nombre}. Debe tener al menos una columna.`);
+        return;
+      }
+      
+      // Eliminar la última columna
+      const columnaEliminada = bloque.subCols.pop();
+      
+      // Registrar cambio
+      registrarCambio('remove', bloque.nombre);
+
+      // Actualizar los datos guardados
+      if (
+        datosGuardados[inst] &&
+        datosGuardados[inst][grupo] &&
+        datosGuardados[inst][grupo][periodo]
+      ) {
+        const data = datosGuardados[inst][grupo][periodo];
+
+        // Calcular la posición donde eliminar
+        let startCol = 1; // después del nombre
+        for (let i = 0; i < bloqueIndex; i++) {
+          startCol += config.bloques[i].subCols.length + 1;
+        }
+        
+        // La posición de la última columna del bloque
+        const colIndex = startCol + bloque.subCols.length;
+
+        // Eliminar en cada fila la columna en la posición correcta
+        datosGuardados[inst][grupo][periodo] = data.map((fila) => {
+          const newFila = [...fila];
+          newFila.splice(colIndex, 1); // Eliminar la columna
+          return newFila;
+        });
+      }
+
+      // Volver a renderizar la tabla
+      renderTabla();
+    }
+
+    function crearBotonesAgregarColumnas(inst, grupo, periodo) {
+      const config = obtenerConfiguracion(inst, grupo, periodo);
+      addColumnButtons.innerHTML = "";
+
+      config.bloques.forEach((bloque, index) => {
+        const container = document.createElement('div');
+        container.className = 'column-management';
+        
+        const title = document.createElement('div');
+        title.className = 'column-title';
+        title.innerHTML = `<i class="fas fa-layer-group"></i> ${bloque.nombre}`;
+        
+        const buttonsRow = document.createElement('div');
+        buttonsRow.style.display = 'flex';
+        buttonsRow.style.gap = '10px';
+        buttonsRow.style.width = '100%';
+        
+        const btnAgregar = document.createElement("button");
+        btnAgregar.className = "btn-agregar";
+        btnAgregar.textContent = "Agregar";
+        btnAgregar.dataset.bloque = index;
+        
+        const btnEliminar = document.createElement("button");
+        btnEliminar.className = "btn-eliminar";
+        btnEliminar.textContent = "Eliminar última";
+        btnEliminar.dataset.bloque = index;
+        
+        // Deshabilitar botón de eliminar si solo hay una columna
+        if (bloque.subCols.length <= 1) {
+          btnEliminar.disabled = true;
+          btnEliminar.style.opacity = "0.6";
+          btnEliminar.style.cursor = "not-allowed";
+        }
+        
+        buttonsRow.appendChild(btnAgregar);
+        buttonsRow.appendChild(btnEliminar);
+        
+        container.appendChild(title);
+        container.appendChild(buttonsRow);
+        addColumnButtons.appendChild(container);
+      });
+    }
+
+    function renderTabla() {
+      const inst = instSelect.value;
+      const grupo = grupoSelect.value;
+      const periodo = periodoSelect.value;
+      const config = obtenerConfiguracion(inst, grupo, periodo);
+
+      const data = cargarDatos(inst, grupo, periodo, config);
+      const { columns, nestedHeaders } = generarColumnasYHeaders(config);
+
+      // Cargar la meta de aprendizaje para este grupo
+      metaInput.value = cargarMeta(inst, grupo, periodo);
+
+      // Crear botones para añadir columnas
+      crearBotonesAgregarColumnas(inst, grupo, periodo);
+
+      if (hot) {
+        hot.destroy();
+        hot = null;
+      }
+
+      // Configuración corregida de Handsontable
+      hot = new Handsontable(contenedor, {
+        data,
+        columns,
+        nestedHeaders,
+        rowHeaders: true,
+        colHeaders: false,
+        licenseKey: "non-commercial-and-evaluation",
+        height: 'auto',
+        manualRowResize: true,
+        manualColumnResize: true,
+        contextMenu: true,
+        filters: false,
+        dropdownMenu: false,
+        columnSorting: true,
+        autoWrapRow: true,
+        autoWrapCol: true,
+        stretchH: "all",
+        className: "htCenter htMiddle",
+        // Configuraciones adicionales para mejorar rendimiento
+        renderAllRows: false,
+        viewportRowRenderingOffset: 'auto',
+        viewportColumnRenderingOffset: 'auto',
+        // Mejorar experiencia táctil
+        outsideClickDeselects: false,
+        selectionMode: 'single'
+      });
+
+      // Configurar eventos
+      hot.addHook('afterChange', (changes, source) => {
+        if (source && source === "calc") return;
+        if (changes) {
+          recalcularNotas(config);
+          guardarDatos(inst, grupo, periodo);
+        }
+      });
+
+      recalcularNotas(config);
+    }
+
+    // Guardar la meta cuando se modifica
+    metaInput.addEventListener("input", function () {
+      const inst = instSelect.value;
+      const grupo = grupoSelect.value;
+      const periodo = periodoSelect.value;
+
+      if (inst && grupo && periodo) {
+        guardarMeta(inst, grupo, periodo);
+      }
+    });
+
+    // Evento delegado para los botones de agregar y eliminar columna
+    addColumnButtons.addEventListener("click", function (e) {
+      if (e.target && e.target.classList.contains("btn-agregar")) {
+        const bloqueIndex = parseInt(e.target.dataset.bloque);
         const inst = instSelect.value;
         const grupo = grupoSelect.value;
         const periodo = periodoSelect.value;
-        const config = obtenerConfiguracion(inst, grupo, periodo);
-
-        const data = cargarDatos(inst, grupo, periodo, config);
-        const { columns, nestedHeaders } = generarColumnasYHeaders(config);
-
-        // Cargar la meta de aprendizaje para este grupo
-        metaInput.value = cargarMeta(inst, grupo, periodo);
-
-        // Crear botones para añadir columnas
-        crearBotonesAgregarColumnas(inst, grupo, periodo);
-
-        if (hot) {
-          hot.destroy();
-          hot = null;
-        }
-
-        hot = new Handsontable(contenedor, {
-          data,
-          columns,
-          nestedHeaders,
-          rowHeaders: true,
-          colHeaders: false,
-          licenseKey: "non-commercial-and-evaluation",
-          height: "auto",
-          manualRowResize: true,
-          manualColumnResize: true,
-          contextMenu: true,
-          filters: false,
-          dropdownMenu: false,
-          columnSorting: true,
-          autoWrapRow: true,
-          autoWrapCol: true,
-          stretchH: "all",
-          className: "htCenter htMiddle",
-        });
-
-        console.log(hot.countCols());
-        console.log(columns.length);
-
-        hot.addHook("afterChange", (changes, source) => {
-          if (source && source === "calc") return;
-          if (changes) {
-            recalcularNotas(config);
-            guardarDatos(inst, grupo, periodo);
-          }
-        });
-
-        recalcularNotas(config);
+        agregarColumnaABloque(inst, grupo, periodo, bloqueIndex);
       }
-
-      // Guardar la meta cuando se modifica
-      metaInput.addEventListener("input", function () {
+      
+      if (e.target && e.target.classList.contains("btn-eliminar")) {
+        const bloqueIndex = parseInt(e.target.dataset.bloque);
         const inst = instSelect.value;
         const grupo = grupoSelect.value;
         const periodo = periodoSelect.value;
+        eliminarUltimaColumnaBloque(inst, grupo, periodo, bloqueIndex);
+      }
+    });
 
-        if (inst && grupo && periodo) {
-          guardarMeta(inst, grupo, periodo);
-        }
-      });
-
-      // Evento delegado para los botones de agregar columna
-      addColumnButtons.addEventListener("click", function (e) {
-        if (e.target && e.target.classList.contains("btn-agregar")) {
-          const bloqueIndex = parseInt(e.target.dataset.bloque);
-          const inst = instSelect.value;
-          const grupo = grupoSelect.value;
-          const periodo = periodoSelect.value;
-
-          agregarColumnaABloque(inst, grupo, periodo, bloqueIndex);
-        }
-      });
-
-      // Eventos de cambio
-      instSelect.addEventListener("change", () => {
-        actualizarGrupos();
-        actualizarPeriodos();
-        renderTabla();
-      });
-
-      grupoSelect.addEventListener("change", renderTabla);
-      periodoSelect.addEventListener("change", renderTabla);
-
-      // Inicialización al cargar
-      instSelect.value = Object.keys(configuraciones)[0];
+    // Eventos de cambio
+    instSelect.addEventListener("change", () => {
       actualizarGrupos();
       actualizarPeriodos();
       renderTabla();
-    </script>
-  </body>
+    });
+
+    grupoSelect.addEventListener("change", renderTabla);
+    periodoSelect.addEventListener("change", renderTabla);
+
+    // Inicialización al cargar
+    instSelect.value = Object.keys(configuraciones)[0];
+    actualizarGrupos();
+    actualizarPeriodos();
+    renderTabla();
+  </script>
+</body>
 </html>
