@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Tabla Calificaciones</title>
+  <link
+    rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/handsontable@12.4.0/dist/handsontable.full.min.css"
+  />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Tabla de Calificaciones</h1>
+      <p class="subtitle">
+        Sistema completo para gestión de calificaciones con columnas personalizables
+      </p>
+    </header>
+
+    <div class="controls">
+      <div class="control-group">
+        <label for="institucion">Institución:</label>
+        <select id="institucion"></select>
+      </div>
+
+      <div class="control-group">
+        <label for="grupo">Grupo:</label>
+        <select id="grupo"></select>
+      </div>
+
+      <div class="control-group">
+        <label for="periodo">Período:</label>
+        <select id="periodo"></select>
+      </div>
+    </div>
+
+    <div class="learning-goal">
+      <h3>Meta de Aprendizaje para el Grupo:</h3>
+      <input
+        type="text"
+        id="metaInput"
+        placeholder="Escribe aquí la meta de aprendizaje para todo el grupo..."
+      />
+    </div>
+
+    <div class="add-column-section">
+      <h3>Gestión de Columnas:</h3>
+      <div id="addColumnButtons" class="buttons-container"></div>
+    </div>
+    
+    <div class="history-panel">
+      <div class="history-title">
+        <i class="fas fa-history"></i>
+        <h3>Historial de Cambios</h3>
+      </div>
+      <div id="changeHistory" class="history-list"></div>
+    </div>
+
+    <div id="tabla"></div>
+
+    <div class="info-section">
+      <h3>Característica:</h3>
+      <p>
+        Ahora puedes añadir y eliminar columnas de evaluación en cada bloque según tus necesidades.
+      </p>
+
+      <div class="features">
+        <div class="feature">
+          <h4>Flexibilidad</h4>
+          <p>
+            Añade o elimina columnas P según sea necesario para evaluar cada aspecto del aprendizaje.
+          </p>
+        </div>
+        <div class="feature">
+          <h4>Personalizado</h4>
+          <p>
+            Cada bloque puede tener un número diferente de columnas según tus necesidades específicas.
+          </p>
+        </div>
+        <div class="feature">
+          <h4>Automático</h4>
+          <p>
+            Los cálculos de notas se actualizan automáticamente al añadir o eliminar columnas.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      Sistema de Calificaciones &copy; 2023 | Con la nueva función de Columnas Dinámicas
+    </footer>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/handsontable@12.4.0/dist/handsontable.full.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
