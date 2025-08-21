@@ -1,4 +1,4 @@
-import { LoginPayload, AuthResponse } from "../../../frontend/src/types/auth";
+import { LoginPayload, AuthResponse } from "../types/auth";
 
 export async function login(payload: LoginPayload): Promise<AuthResponse> {
     const response = await fetch("http://localhost:3000/api/auth/login", {
@@ -9,6 +9,7 @@ export async function login(payload: LoginPayload): Promise<AuthResponse> {
         body: JSON.stringify(payload),
     });
     if(!response.ok) throw new Error("Credenciales inválidas");
+    alert("Inicio de sesión exitoso");
     return await response.json();
 }
 
