@@ -15,8 +15,10 @@ export default function LoginPage() {
     e.preventDefault();
     try {
       const res = await login({ email, password });
+      alert("Inicio de sesión exitoso");
       console.log("Usuario logueado", res);
       // Redirigir a la página principal.
+      window.location.href = "/";
     } catch (error: unknown) {
       if (error instanceof Error) {
         alert(error.message);
@@ -25,7 +27,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-blue-50 to-blue-100">
+    <div className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-blue-50 to-blue-100 text-black">
       {/* Card */}
       <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8">
         {/* Logo */}
@@ -33,7 +35,7 @@ export default function LoginPage() {
           <Image 
             src= {loginImage}
             alt="Logo Institucional"
-            className="h-56 w-auto"
+            className="h-60 w-auto"
           />
         </div>
 
@@ -83,7 +85,7 @@ export default function LoginPage() {
 
       {/* Footer */}
       <p className="mt-6 text-xs text-gray-500">
-        © {new Date().getFullYear()} Nombre de la Institución. Todos los
+        © {new Date().getFullYear()} EduPlus📚. Todos los
         derechos reservados.
       </p>
     </div>

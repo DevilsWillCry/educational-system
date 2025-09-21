@@ -9,13 +9,12 @@ export async function login(payload: LoginPayload): Promise<AuthResponse> {
         body: JSON.stringify(payload),
     });
     if(!response.ok) throw new Error("Credenciales inválidas");
-    alert("Inicio de sesión exitoso");
     return await response.json();
 }
 
 
 export async function resetPassword(email: string){
-    const response = await fetch("http://localhost:3000/api/auth/reset", {
+    const response = await fetch("http://localhost:3000/api/auth/reset-password", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
